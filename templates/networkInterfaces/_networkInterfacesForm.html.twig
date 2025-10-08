@@ -1,0 +1,264 @@
+{{ include('_jsForms.html.twig') }}
+
+<script>
+	$(function () {
+		{% if app.request.get('mode') == 'bulkEdit' %}
+			$('.bulkEditSubmit').on('click', function () {
+				$.ajax({
+					type: 'POST',
+					url: "{{ path('app_networkInterfacesBulkEdit') }}",
+					data: function() {
+						let formData = new FormData(); 
+
+						// Selecciona solo los elementos que NO están deshabilitados
+						$('form[name={{ form.vars.id }}] :input:not(:disabled)').each(function() {
+							// Verifica si es un select
+							if ($(this).is('select')) {
+								formData.append(this.name, $(this).val() || ""); 
+							} else { 
+								// Para otros tipos de input, como text, checkbox, etc.
+								formData.append(this.name, $(this).val());
+							}
+						});
+
+						return formData;
+					}(),
+					processData: false,
+					contentType: false
+				}).done(function (data) {
+					location.reload();
+				});
+			});
+			{% set hiddenFields = ['network_interface_name'] %}
+			{% for hiddenField in hiddenFields %}
+				$('input#{{ hiddenField }}').closest('.form-group').hide();
+			{% endfor %}
+		{% endif %}
+	});
+</script>
+
+{{ form_start(form) }}
+<div class="card">
+	{% if app.request.get('objectsToEdit') is not empty %}
+	<input type="hidden" name="objectsToEdit" value="{{ app.request.get('objectsToEdit')|join(',') }}">
+	{% endif %}
+	<div class="card-header">
+		<h3 class="card-title">Network Interface{% if form.vars.value != '' and object is defined %} {{ object.name }}{% endif %}{% if app.request.get('objectsToEdit') is not empty %} ({{ app.request.get('objectsToEdit')|length }} items selected){% endif %}</h3>
+		
+		<div class="card-tools">
+			{% if is_granted('ROLE_NETWORKINTERFACE_EDITOR') %}
+					<div class="btn-group">
+						{% if (form.name.vars.value != '' and object is defined) or app.request.get('mode') == 'bulkEdit' %}
+							<button class="btn bg-green{% if app.request.get('mode') == 'bulkEdit' %} bulkEditSubmit{% endif %}">
+								<i class="fa fa-save"></i>
+								Save</button>
+						{% elseif form.name.vars.value == '' %}
+							<button class="btn bg-green">
+								<i class="fa fa-save"></i>
+								Create New</button>
+						{% endif %}
+					</div>
+			{% endif %}
+			{% if object is defined %}
+				{% if object.active == true %}
+					{% if is_granted('ROLE_NETWORKINTERFACE_EDITOR') %}<a href="#" addressTo="{{ path('app_networkInterfaceDelete', {id: object.id}) }}" containerTo="nav-detail" class="btn btn-dark toggle-view-edit"><i class="fa fa-trash"></i> Delete</a>{% endif %}
+					{% if is_granted('ROLE_IP_EDITOR') %}<a href="#" addressTo="{{ path('app_ipsAdd', {preset: {'ip_networkInterface': object.id}, returnTo: {'name': object.name, 'link': path('app_networkInterfacesEdit', {id: object.id})}}) }}" containerTo="nav-detail" class="btn btn-primary toggle-view-edit"><i class="fa fa-plus"></i> New IP</a>{% endif %}
+					<a href="#" addressTo="{{ path('app_networkInterfacesView', {id: object.id}) }}" containerTo="nav-detail" class="btn btn-primary toggle-view-edit"><i class="fa fa-eye"></i> View</a>
+				{% endif %}
+			{% endif %}
+			{% if app.request.get('returnTo') is not empty %}<a href="#" addressTo="{{ app.request.get('returnTo')['link'] }}" containerTo="nav-detail" class="btn btn-primary toggle-view-edit"><i class="fa fa-long-arrow-alt-left"></i> Return to {{ app.request.get('returnTo')['name'] }}</a>{% endif %}
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form_label(form.name) }}
+				{{ form_errors(form.name) }}
+				{{ form_widget(form.name, {
+						'attr': {
+							'placeholder': 'Name',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.name) }}
+			</div>
+			<div class="form-group col-md-3">
+				{{ form_label(form.networkVirtualSystem) }}
+				{{ form_errors(form.networkVirtualSystem) }}
+				{{ form_widget(form.networkVirtualSystem, {
+						'attr': {
+							'placeholder': 'Network Virtual System',
+							'class': 'form-control single-select2-ajax onlyOne',
+							'ajaxEndpoint': path('app_select2networkVirtualSystemsData'),
+							'required': form.networkVirtualSystem.vars.required,
+						}
+					})
+					}}
+				{{ form_help(form.networkVirtualSystem) }}
+			</div>
+			<div class="form-group col-md-3">
+				{{ form_label(form.workplaceVirtualSystem) }}
+				{{ form_errors(form.workplaceVirtualSystem) }}
+				{{ form_widget(form.workplaceVirtualSystem, {
+						'attr': {
+							'placeholder': 'Workplace Virtual System',
+							'class': 'form-control single-select2-ajax onlyOne',
+							'ajaxEndpoint': path('app_select2workplaceVirtualSystemsData'),
+							'required': form.workplaceVirtualSystem.vars.required,
+						}
+					})
+					}}
+				{{ form_help(form.workplaceVirtualSystem) }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+			</div>
+			<div class="form-group col-md-6">
+				{{ form_label(form.environment) }}
+				{{ form_errors(form.environment) }}
+				{{ form_widget(form.environment, {
+						'attr': {
+							'placeholder': 'Environment',
+							'class': 'form-control single-select2-ajax',
+							'ajaxEndpoint': path('app_select2environmentsData'),
+							'required': form.environment.vars.required,
+						}
+					})
+					}}
+				{{ form_help(form.environment) }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form_label(form.description) }}
+				{{ form_errors(form.description) }}
+				{{ form_widget(form.description, {
+						'attr': {
+							'placeholder': 'Description',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.description) }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form_label(form.comments) }}
+				{{ form_errors(form.comments) }}
+				{{ form_widget(form.comments, {
+						'attr': {
+							'placeholder': 'Comments',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.comments) }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-4">
+				{{ form_label(form.macAddress) }}
+				{{ form_errors(form.macAddress) }}
+				{{ form_widget(form.macAddress, {
+						'attr': {
+							'placeholder': 'MAC Address',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.macAddress) }}
+			</div>
+			<div class="form-group col-md-4">
+				{{ form_label(form.adapterType) }}
+				{{ form_errors(form.adapterType) }}
+				{{ form_widget(form.adapterType, {
+						'attr': {
+							'placeholder': 'Adapter Type',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.adapterType) }}
+			</div>
+			<div class="form-group col-md-4">
+				{{ form_label(form.defaultGateway) }}
+				{{ form_errors(form.defaultGateway) }}
+				{{ form_widget(form.defaultGateway, {
+						'attr': {
+							'placeholder': 'Default Gateway',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.defaultGateway) }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-4">
+				{{ form_label(form.dhcpEnabled) }}
+				{{ form_errors(form.dhcpEnabled) }}
+				{{ form_widget(form.dhcpEnabled, {
+						'attr': {
+							'placeholder': 'Is DHCP Enabled',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.dhcpEnabled) }}
+			</div>
+			<div class="form-group col-md-4">
+				{{ form_label(form.dhcpServer) }}
+				{{ form_errors(form.dhcpServer) }}
+				{{ form_widget(form.dhcpServer, {
+						'attr': {
+							'placeholder': 'DHCP Server',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.dhcpServer) }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-4">
+				{{ form_label(form.dnsHostname) }}
+				{{ form_errors(form.dnsHostname) }}
+				{{ form_widget(form.dnsHostname, {
+						'attr': {
+							'placeholder': 'DNS hostname',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.dnsHostname) }}
+			</div>
+			<div class="form-group col-md-4">
+				{{ form_label(form.dnsDomain) }}
+				{{ form_errors(form.dnsDomain) }}
+				{{ form_widget(form.dnsDomain, {
+						'attr': {
+							'placeholder': 'DNS domain',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.dnsDomain) }}
+			</div>
+			<div class="form-group col-md-4">
+				{{ form_label(form.dnsServer) }}
+				{{ form_errors(form.dnsServer) }}
+				{{ form_widget(form.dnsServer, {
+						'attr': {
+							'placeholder': 'DNS Server',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.dnsServer) }}
+			</div>
+		</div>
+	</div>
+	<!-- /.card-body -->
+</div>
+{{ form_end(form) }}

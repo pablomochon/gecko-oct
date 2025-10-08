@@ -1,0 +1,47 @@
+<link rel="stylesheet" href="{{ asset('js/summernote-bs4.min.css') }}?v={{ filemtime( asset('js/summernote-bs4.min.css') ) }}">
+<script src="{{ asset('js/summernote-bs4.min.js') }}?v={{ filemtime( asset('js/summernote-bs4.min.js') ) }}"></script>
+<script src="{{ asset('js/forms.js') }}?v={{ filemtime( asset('js/forms.js') ) }}"></script>
+
+<script>
+	$(function () {
+		{% if app.request.get('preset') is not empty %}
+			{% for presetIndex, presetValue in app.request.get('preset') %}
+				$('#{{ presetIndex }}').val('{{ presetValue }}');
+				if ($('#{{ presetIndex }}').hasClass("select2-hidden-accessible")) {
+					$.ajax({
+						type: 'GET',
+						url: $('#{{ presetIndex }}').attr('ajaxEndpoint') + '/{{ presetValue }}'
+					}).then(function (data) {
+						// create the option and append to Select2
+						var option = new Option(data.text, data.id, true, true);
+						$('#{{ presetIndex }}').append(option).trigger('change');
+
+						// manually trigger the `select2:select` event
+						$('#{{ presetIndex }}').trigger({
+							type: 'select2:select',
+							params: {
+								data: data
+							}
+						});
+					});
+				}
+			{% endfor %}
+		{% endif %}
+
+		$('.onlyOne').each(function (i, obj) {
+			if ($(obj).hasClass("select2-hidden-accessible")) {
+				$(obj).on('change', function (e, isScriptInvoked) {
+					if(isScriptInvoked === undefined) {
+						$('.onlyOne').each(function (i, obj2) {
+							if(obj != obj2) {
+								if($(obj2).select2('data').length != 0) {
+									$(obj2).val(null).trigger('change', [true]);
+								}
+							}
+						});
+					}
+				});
+			}
+		});
+	});
+</script>

@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block javascripts %}
+	<script src="{{ asset('js/tabulator.min.js') }}"></script>
+	<script>
+		$(function () {
+			var table = new Tabulator("#samlprofiles-tabulator-table", {
+                pagination: true,
+                paginationSize:10,
+                paginationSizeSelector:[10, 20, 50, 100, 250, 500, 1000],
+                paginationCounter:"rows",
+                movableColumns: true,
+                persistence:{
+                    columns:true,
+                },
+				data: 
+					[
+						{% for element in table %}
+						{
+							id: '{{ element.id }}',
+							name: '{{ element.name }}',
+							roles: '{% for subelement in element.roles %}{{ subelement }}{% if not loop.last %}, {% endif %}{% endfor %}',
+						},
+						{% endfor %}
+					]
+				,
+				columns:[
+					{title:"Id", field:"id", sorter:"number", visible: false},
+					{title:"Name", field:"name", sorter:"string", headerFilter:"input"},
+					{title:"Roles", field:"roles", sorter:"string", headerFilter:"input"},
+				],
+			});
+            
+            table.on("rowClick", function(e, row){
+                let id = row.getData().id;
+
+                $.ajax({
+                    url: "/samlProfiles/" + id,
+                }).done(function( data ) {
+                    $('#modal-detail-body').html( data );
+                    $('#modal-detail').modal('show');
+                });
+            });
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa fa-user-tag"></i> {{ pageTitle }}</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool"  data-toggle="modal" data-target="#modal-add" urlAdd="{{ path('app_samlProfilesAdd') }}">
+                            <i class="fa fa-plus"></i> New SAML Profile
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+					<div id="samlprofiles-tabulator-table"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-add">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-plus"></i> New SAML Profile</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="modal-add-body">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="modal-detail">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-user-tag"></i> SAML Profile</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="modal-detail-body">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

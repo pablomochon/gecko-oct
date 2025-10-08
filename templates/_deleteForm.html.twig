@@ -1,0 +1,36 @@
+{{ include('_jsForms.html.twig') }}
+
+<div class="card">
+	<div class="card-header">
+		<h3 class="card-title">
+			{% if object.name is defined %}{{ object.name }}{% endif %}
+			{% if object.ip is defined %}{{ object.ip }}{% endif %}
+		</h3>
+
+		<div class="card-tools">
+			<a href="{{ deleteLink }}" class="btn btn-dark"><i class="fa fa-trash"></i> Confirm Delete</a>
+			<a href="#" addressTo="{{ editLink }}" containerTo="nav-detail" class="btn btn-primary toggle-view-edit"><i class="fa fa-long-arrow-alt-left"></i> Return to Edit</a>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="container-fluid">
+			<div class="row">
+                <div class="col-md-9">
+				{% if related is defined %}
+					<p><strong>This objects will also be deleted:</strong></p>
+                    {% for relatedObject in related %}
+                    <p>{{ relatedObject }}</p>
+                    {% if loop.last == false %}<hr>{% endif %}
+                    {% endfor %}
+				{% else %}
+					<p><strong>Confirm?</strong></p>
+				{% endif %}
+                </div>
+                <!-- /.col -->
+			</div>
+			<!-- /.row -->
+		</div>
+        <!-- /.container-fluid -->
+	</div>
+	<!-- /.card-body -->
+</div>

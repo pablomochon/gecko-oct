@@ -1,0 +1,217 @@
+{{ include('_jsForms.html.twig') }}
+
+<script>
+	// This script is used to handle the bulk edit functionality for the form.
+	// It collects all the input values from the form and sends them via AJAX to the server.
+	// The server processes the data and returns a response, which is then handled by the contract.
+
+	// This function is executed when the document is ready.
+
+	$(function () {
+		{% if app.request.get('mode') == 'bulkEdit' %}
+			$('.bulkEditSubmit').on('click', function () {
+				$.ajax({
+					type: 'POST',
+					url: "{{ path('app_contractsBulkEdit') }}",
+					data: function() {
+						let formData = new FormData(); 
+
+						// Selecciona solo los elementos que NO están deshabilitados
+						$('form[name={{ form.vars.id }}] :input:not(:disabled)').each(function() {
+							// Verifica si es un select
+							if ($(this).is('select')) {
+								formData.append(this.name, $(this).val() || ""); 
+							} else { 
+								// Para otros tipos de input, como text, checkbox, etc.
+								formData.append(this.name, $(this).val());
+							}
+						});
+
+						return formData;
+					}(),
+					processData: false,
+					contentType: false
+				}).done(function (data) {
+					location.reload();
+				});
+			});
+			{% set hiddenFields = ['contract_name'] %}
+			{% for hiddenField in hiddenFields %}
+				$('input#{{ hiddenField }}').closest('.form-group').hide();
+			{% endfor %}
+		{% endif %}
+	});
+</script>
+
+{{ form_start(form) }}
+<div class="card">
+	{% if app.request.get('objectsToEdit') is not empty %}
+	<input type="hidden" name="objectsToEdit" value="{{ app.request.get('objectsToEdit')|join(',') }}">
+	{% endif %}
+	<div class="card-header">
+		<h3 class="card-title">{% if form.vars.value != '' and object is defined %} {{ object.name }}{% endif %}{% if app.request.get('objectsToEdit') is not empty %} ({{ app.request.get('objectsToEdit')|length }} items selected){% endif %}</h3>
+
+		<div class="card-tools">
+			{% if is_granted('ROLE_BUSINESSRULES_EDITOR') %}
+					<div class="btn-group">
+						{% if (form.name.vars.value != '' and object is defined) or app.request.get('mode') == 'bulkEdit' %}
+							<button class="btn bg-green{% if app.request.get('mode') == 'bulkEdit' %} bulkEditSubmit{% endif %}">
+								<i class="fa fa-save"></i>
+								Save</button>
+						{% elseif form.name.vars.value == '' %}
+							<button class="btn bg-green">
+								<i class="fa fa-save"></i>
+								Create New</button>
+						{% endif %}
+					</div>
+			{% endif %}
+			{% if object is defined %}
+				{% if object.active == true %}
+					{% if is_granted('ROLE_BUSINESSRULES_EDITOR') %}<a href="#" addressTo="{{ path('app_contractsDelete', {id: object.id}) }}" containerTo="nav-detail" class="btn btn-dark toggle-view-edit"><i class="fa fa-trash"></i> Delete</a>{% endif %}
+				{% endif %}
+			{% endif %}
+			{% if app.request.get('returnTo') is not empty %}<a href="#" addressTo="{{ app.request.get('returnTo')['link'] }}" containerTo="nav-detail" class="btn btn-primary toggle-view-edit"><i class="fa fa-long-arrow-alt-left"></i> Return to {{ app.request.get('returnTo')['name'] }}</a>{% endif %}
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="form-row">
+		
+			<div class="form-group col-md-6">
+				{{ form_label(form.name) }}
+				{{ form_errors(form.name) }}
+				{{ form_widget(form.name, {
+						'attr': {
+							'placeholder': 'Name',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.name) }}
+			</div>
+
+			<div class="form-group col-md-3">
+				{{ form_label(form.status) }}
+				{{ form_errors(form.status) }}
+				{{ form_widget(form.status, {
+						'attr': {
+							'placeholder': 'Status',
+							'class': 'form-control single-select2',
+						}
+					})
+					}}
+				{{ form_help(form.status) }}
+			</div>
+
+			<div class="form-group col-md-6">
+				{{ form_label(form.startDate) }}
+				{{ form_errors(form.startDate) }}
+				{{ form_widget(form.startDate, {
+						'attr': {
+							'placeholder': 'Start Date',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.startDate) }}
+			</div>
+
+			<div class="form-group col-md-6">
+				{{ form_label(form.endDate) }}
+				{{ form_errors(form.endDate) }}
+				{{ form_widget(form.endDate, {
+						'attr': {
+							'placeholder': 'End Date',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.endDate) }}
+			</div>
+
+			<div class="form-group col-md-6">
+				{{ form_label(form.manufacturer) }}
+				{{ form_errors(form.manufacturer) }}
+				{{ form_widget(form.manufacturer, {
+						'attr': {
+							'placeholder': 'Manufacturer',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.manufacturer) }}
+			</div>
+
+			<div class="form-group col-md-6">
+				{{ form_label(form.provider) }}
+				{{ form_errors(form.provider) }}
+				{{ form_widget(form.provider, {
+						'attr': {
+							'placeholder': 'Provider',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.provider) }}
+			</div>
+
+			<div class="form-group col-md-6">
+				{{ form_label(form.cost) }}
+				{{ form_errors(form.cost) }}
+				{{ form_widget(form.cost, {
+						'attr': {
+							'placeholder': 'Cost',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.cost) }}
+			</div>
+
+			<div class="form-group col-md-6">
+				{{ form_label(form.notes) }}
+				{{ form_errors(form.notes) }}
+				{{ form_widget(form.notes, {
+						'attr': {
+							'placeholder': 'Notes',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.notes) }}
+			</div>
+
+			<div class="form-group col-md-6">
+				{{ form_label(form.networkDevices) }}
+				{{ form_errors(form.networkDevices) }}
+				{{ form_widget(form.networkDevices, {
+						'attr': {
+                            'placeholder': 'Select Network Devices',
+							'class': 'form-control single-select2-ajax',
+							'ajaxEndpoint': path('app_select2networkDeviceData'),
+							'required': form.networkDevices.vars.required,
+						}
+					})
+					}}
+				{{ form_help(form.networkDevices) }}
+			</div>
+
+			<div class="form-group col-md-6">
+				{{ form_label(form.networkVirtualSystems) }}
+				{{ form_errors(form.networkVirtualSystems) }}
+				{{ form_widget(form.networkVirtualSystems, {
+						'attr': {
+                            'placeholder': 'Select Virtual Systems',
+							'class': 'form-control single-select2-ajax',
+							'ajaxEndpoint': path('app_select2networkVirtualSystemsData'),
+							'required': form.networkVirtualSystems.vars.required,
+						}
+					})
+					}}
+				{{ form_help(form.networkVirtualSystems) }}
+			</div>
+
+		</div>
+	</div>
+	<!-- /.card-body -->
+</div>
+{{ form_end(form) }}

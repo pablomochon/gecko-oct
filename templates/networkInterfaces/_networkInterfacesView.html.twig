@@ -1,0 +1,122 @@
+{{ include('_jsForms.html.twig') }}
+
+<div class="card">
+	<div class="card-body">
+{# 
+		{% if object.environment is not empty %}
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{{ path('app_clientsDetail', {id: object.environment.service.client.id}) }}"><i class="fa fa-briefcase"></i> Client: {{ object.environment.service.client.name }}</a></li>
+				<li class="breadcrumb-item"><a href="{{ path('app_servicesDetail', {id: object.environment.service.id}) }}"><i class="fa fa-briefcase"></i> Service: {{ object.environment.service.name }}</a></li>
+				<li class="breadcrumb-item"><a href="{{ path('app_environmentsDetail', {id: object.environment.id}) }}"><i class="fa fa-briefcase"></i> Environment: {{ object.environment.name }}</a></li>
+				<li class="breadcrumb-item active" aria-current="page"><i class="fa fa-ethernet"></i> Network Interface: {{ object.name }}</li>
+			</ol>
+		</nav>
+		{% endif %}
+
+		{% if object.networkVirtualSystem is not empty %}
+			{% if object.networkVirtualSystem.environment is not empty %}
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="{{ path('app_clientsDetail', {id: object.networkVirtualSystem.environment.service.client.id}) }}"><i class="fa fa-briefcase"></i> Client: {{ object.networkVirtualSystem.environment.service.client.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_servicesDetail', {id: object.networkVirtualSystem.environment.service.id}) }}"><i class="fa fa-briefcase"></i> Service: {{ object.networkVirtualSystem.environment.service.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_environmentsDetail', {id: object.networkVirtualSystem.environment.id}) }}"><i class="fa fa-briefcase"></i> Environment: {{ object.networkVirtualSystem.environment.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_networkVirtualSystemsDetail', {id: object.networkVirtualSystem.id}) }}"><i class="fa fa-network-wired"></i> Network Virtual System: {{ object.networkVirtualSystem.name }}</a></li>
+					<li class="breadcrumb-item active" aria-current="page"><i class="fa fa-ethernet"></i> Network Interface: {{ object.name }}</li>
+				</ol>
+			</nav>
+			{% endif %}
+
+			{% if object.networkVirtualSystem.networkDevice is not empty %}
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="{{ path('app_clientsDetail', {id: object.networkVirtualSystem.networkDevice.environment.service.client.id}) }}"><i class="fa fa-briefcase"></i> Client: {{ object.networkVirtualSystem.networkDevice.environment.service.client.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_servicesDetail', {id: object.networkVirtualSystem.networkDevice.environment.service.id}) }}"><i class="fa fa-briefcase"></i> Service: {{ object.networkVirtualSystem.networkDevice.environment.service.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_environmentsDetail', {id: object.networkVirtualSystem.networkDevice.environment.id}) }}"><i class="fa fa-briefcase"></i> Environment: {{ object.networkVirtualSystem.networkDevice.environment.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_networkDeviceDetail', {id: object.networkVirtualSystem.networkDevice.id}) }}"><i class="fa fa-network-wired"></i> Network Device: {{ object.networkVirtualSystem.networkDevice.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_networkVirtualSystemsDetail', {id: object.networkVirtualSystem.id}) }}"><i class="fa fa-network-wired"></i> Network Virtual System: {{ object.networkVirtualSystem.name }}</a></li>
+					<li class="breadcrumb-item active" aria-current="page"><i class="fa fa-ethernet"></i> Network Interface: {{ object.name }}</li>
+				</ol>
+			</nav>
+
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item">
+						<a href="{{ path('app_locationsDetail', {id: object.networkVirtualSystem.networkDevice.subSpace.space.location.id}) }}"><i class="fa fa-map-marked"></i> Location: {{ object.networkVirtualSystem.networkDevice.subSpace.space.location.name }}
+						{% if object.networkVirtualSystem.networkDevice.subSpace.space.location.client is not empty %}
+								({{ object.networkVirtualSystem.networkDevice.subSpace.space.location.client.name }})
+						{% endif %}
+						</a>
+					</li>
+					<li class="breadcrumb-item"><a href="{{ path('app_spacesDetail', {id: object.networkVirtualSystem.networkDevice.subSpace.space.id}) }}"><i class="fa fa-map-marked"></i> Space: {{ object.networkVirtualSystem.networkDevice.subSpace.space.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_subSpacesDetail', {id: object.networkVirtualSystem.networkDevice.subSpace.id}) }}"><i class="fa fa-map-marked"></i> SubSpace: {{ object.networkVirtualSystem.networkDevice.subSpace.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_networkDeviceDetail', {id: object.networkVirtualSystem.networkDevice.id}) }}"><i class="fa fa-network-wired"></i> Network Device: {{ object.networkVirtualSystem.networkDevice.name }}</a></li>
+					<li class="breadcrumb-item"><a href="{{ path('app_networkVirtualSystemsDetail', {id: object.networkVirtualSystem.id}) }}"><i class="fa fa-network-wired"></i> Network Virtual System: {{ object.networkVirtualSystem.name }}</a></li>
+					<li class="breadcrumb-item active" aria-current="page"><i class="fa fa-ethernet"></i> Network Interface: {{ object.name }}</li>
+				</ol>
+			</nav>
+			{% endif %}
+		{% endif %}
+#}
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-3">
+					<div class="card card-primary card-outline">
+						<div class="card-body box-profile">
+							<h3 class="profile-username text-center">{{ object.name }}</h3>
+
+							<p class="text-muted text-center">
+								{{ object.adapterType }}
+							</p>
+							
+							<ul class="list-group list-group-unbordered mb-3 text-break">
+								<li class="list-group-item">
+									<b>Description</b> <a class="float-right">{{ object.description|default('NO DATA') }}</a>
+								</li>
+								<li class="list-group-item">
+									<b>Comments</b> <a class="float-right">{{ object.comments|default('NO DATA') }}</a>
+								</li>
+								<li class="list-group-item">
+									<b>MAC Address</b> <a class="float-right">{{ object.macAddress|default('NO DATA') }}</a>
+								</li>
+								<li class="list-group-item">
+									<b>Default Gateway</b> <a class="float-right">{{ object.defaultGateway|default('NO DATA') }}</a>
+								</li>
+								<li class="list-group-item">
+									<b>DHCP enabled</b> <a class="float-right">{% if object.dhcpEnabled == true %}true{% else %}false{% endif %}</a>
+								</li>
+								{% if object.dhcpEnabled == true %}
+								<li class="list-group-item">
+									<b>DHCP Server</b> <a class="float-right">{{ object.dhcpServer }}</a>
+								</li>
+								{% endif %}
+								<li class="list-group-item">
+									<b>DNS hostname</b> <a class="float-right">{{ object.dnsHostname|default('NO DATA') }}</a>
+								</li>
+								<li class="list-group-item">
+									<b>DNS domain</b> <a class="float-right">{{ object.dnsDomain|default('NO DATA') }}</a>
+								</li>
+								<li class="list-group-item">
+									<b>DNS server</b> <a class="float-right">{{ object.dnsServer|default('NO DATA') }}</a>
+								</li>
+								{% if object.active == false %}
+								<li class="list-group-item text-center">
+									<button type="button" class="btn btn-sm btn-danger" title="Not Active">
+										Not Active
+									</button>
+								</li>
+								{% endif %}
+							</ul>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+				<!-- /.col -->
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container-fluid -->
+	</div>
+	<!-- /.card-body -->
+</div>

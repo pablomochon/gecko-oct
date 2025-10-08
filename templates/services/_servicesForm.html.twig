@@ -1,0 +1,93 @@
+{{ include('_jsForms.html.twig') }}
+
+{{ form_start(form) }}
+<div class="card">
+	{% if app.request.get('objectsToEdit') is not empty %}
+	<input type="hidden" name="objectsToEdit" value="{{ app.request.get('objectsToEdit')|join(',') }}">
+	{% endif %}
+	<div class="card-header">
+		<h3 class="card-title">{% if form.vars.value != '' and object is defined %} {{ object.name }}{% endif %}{% if app.request.get('objectsToEdit') is not empty %} ({{ app.request.get('objectsToEdit')|length }} items selected){% endif %}</h3>
+
+		<div class="card-tools">
+			{% if object is defined %}
+				{% if object.active == true %}
+					{% if is_granted('ROLE_BUSINESSRULES_EDITOR') %}<a href="#" addressTo="{{ path('app_servicesDelete', {id: object.id}) }}" containerTo="nav-detail" class="btn btn-dark toggle-view-edit"><i class="fa fa-trash"></i> Delete</a>{% endif %}
+					<a href="#" addressTo="{{ path('app_servicesView', {id: object.id}) }}" containerTo="nav-detail" class="btn btn-primary toggle-view-edit"><i class="fa fa-eye"></i> View</a>
+				{% endif %}
+			{% endif %}
+			{% if app.request.get('returnTo') is not empty %}<a href="#" addressTo="{{ app.request.get('returnTo')['link'] }}" containerTo="nav-detail" class="btn btn-primary toggle-view-edit"><i class="fa fa-long-arrow-alt-left"></i> Return to {{ app.request.get('returnTo')['name'] }}</a>{% endif %}
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form_label(form.client) }}
+				{{ form_errors(form.client) }}
+				{{ form_widget(form.client, {
+						'attr': {
+							'placeholder': 'Client',
+							'class': 'form-control single-select2-ajax',
+							'ajaxEndpoint': path('app_select2clientsData'),
+							'required': form.client.vars.required,
+						}
+					})
+					}}
+				{{ form_help(form.client) }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form_label(form.name) }}
+				{{ form_errors(form.name) }}
+				{{ form_widget(form.name, {
+						'attr': {
+							'placeholder': 'Name',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.name) }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form_label(form.description) }}
+				{{ form_errors(form.description) }}
+				{{ form_widget(form.description, {
+						'attr': {
+							'placeholder': 'Description',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.description) }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form_label(form.tcosrv) }}
+				{{ form_errors(form.tcosrv) }}
+				{{ form_widget(form.tcosrv, {
+						'attr': {
+							'placeholder': 'TCOSRV',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.tcosrv) }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form_label(form.pep) }}
+				{{ form_errors(form.pep) }}
+				{{ form_widget(form.pep, {
+						'attr': {
+							'placeholder': 'PeP',
+							'class': 'form-control',
+						}
+					})
+					}}
+				{{ form_help(form.pep) }}
+			</div>
+		</div>
+	</div>
+	<!-- /.card-body -->
+</div>
+{{ form_end(form) }}

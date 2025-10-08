@@ -1,0 +1,256 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ pageTitle }}
+{% endblock %}
+
+{% block javascripts %}
+	<script src="{{ asset('js/tabulator.min.js') }}?v={{ filemtime( asset('js/tabulator.min.js') ) }}"></script>
+	<script src="{{ asset('js/xlsx.full.min.js') }}?v={{ filemtime( asset('js/xlsx.full.min.js') ) }}"></script>
+    <script src="{{ asset('js/tabulator-setup-columns.js') }}?v={{ filemtime( asset('js/tabulator-setup-columns.js') ) }}"></script>
+    <script src="{{ asset('js/table-filters.js') }}?v={{ filemtime( asset('js/table-filters.js') ) }}"></script>
+	<script>
+		$(function () {
+            var headerMenu = [
+                {
+                    label:"Edit Elements",
+                    action:function(e, column){
+                        var objectsToEdit = [];
+                        $(table.getSelectedData()).each(function (i, obj) {
+                            objectsToEdit.push(obj.id);
+                        });
+                    }
+                },
+            ];
+			var table = new Tabulator("#clients-tabulator-table", {
+                pagination: true,
+                paginationSize:10,
+                paginationSizeSelector:[10, 20, 50, 100, 250, 500, 1000],
+                paginationCounter:"rows",
+                movableColumns: true,
+                persistence:{
+                    sort:true,
+                    filter:true,
+                    columns:true,
+                },
+                headerFilterLiveFilterDelay:300,
+                ajaxURL: "{{ path('app_clientsPOST') }}",
+                ajaxConfig:"POST",
+                ajaxURLGenerator:function(url, config, params){
+                    var columnVisibility = [];
+
+                    $(table.getColumns()).each(function (i, obj) {
+                        var field = obj.getField();
+                        var visibility = obj.isVisible();
+                        if(field == "selector") return;
+                        columnVisibility.push({[field]: visibility});
+                    });
+                    
+                    if(location.search.substring(1).length > 0) {
+                        var extra = "&" + location.search.substring(1);
+                    } else {
+                        var extra = "";
+                    }
+                    
+                    return url + "?params=" + encodeURI(JSON.stringify(params)) + "&columnVisibility=" + encodeURI(JSON.stringify(columnVisibility)) + extra;
+                },
+                persistenceID: "{{ templatemtime }}",
+                columnDefaults: {
+                    tooltip: true,
+                },
+				columns:[
+                    {% if is_granted('ROLE_DATA_UPLOADER') %}{title:"Selector", field:"selector", formatter:"rowSelection", headerMenu:headerMenu, titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, visible:false},{% endif %}
+					{title:"Id", field:"id", sorter:"number", visible: false},
+					{title:"Name", field:"name", sorter:"string", headerFilter:"input"},
+					{title:"Code", field:"code", sorter:"string", headerFilter:"input", visible: false},
+					{title:"Services", field:"services", sorter:"string", headerFilter:"input"},
+				],
+			});
+
+            table.on("rowClick", function(e, row){
+                let id = row.getData().id;
+
+                $.ajax({
+                    {% if app.request.get('active') is not empty %}
+                        {% if app.request.get('active') == "false" %}
+                            url: "/clients/" + id + '/edit',
+                        {% else %}
+                            url: "/clients/" + id + '/view',
+                        {% endif %}
+                    {% else %}
+                        url: "/clients/" + id + '/view',
+                    {% endif %}
+                }).done(function( data ) {
+                    $('#nav-detail').html( data );
+                    $('#modal-detail').modal('show');
+                });
+
+                $.ajax({
+                    url: "/clients/" + id + "/audit/",
+                }).done(function( data ) {
+                    $('#nav-audit').html( data );
+                });
+            });
+
+            $('.btn-tabulator-download').click(function () {
+                if($(this).hasClass('btn-csv')) {
+                    table.download("csv", "{{ pageTitle }}-{{ "now"|date("YmdHis") }}.csv", {bom:true});
+                } else if($(this).hasClass('btn-xlsx')) {
+                    table.download("xlsx", "{{ pageTitle }}-{{ "now"|date("YmdHis") }}.xlsx", {sheetName:"{{ pageTitle }}"});
+                } else if($(this).hasClass('btn-json')) {
+                    table.download("json", "{{ pageTitle }}-{{ "now"|date("YmdHis") }}.json");
+                }
+            });
+
+            table.on("tableBuilt", function(){
+                createOptionsSetupColumns(table);
+                TableFiltersManager.init(table);
+            });
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa fa-briefcase"></i> {{ pageTitle }}</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool"  data-toggle="modal" data-target="#modal-group-columns">
+                            <i class="fa fa-layer-group"></i> Group Columns
+                        </button>
+                        <button type="button" class="btn btn-tool"  data-toggle="modal" data-target="#modal-setup-columns">
+                            <i class="fa fa-columns"></i> Setup Columns
+                        </button>
+
+                        {{ include('_filterButtons.html.twig') }}
+
+
+                        {% if is_granted('ROLE_TOOLS_VIEWER') %}
+                        <a href="{{ path('app_utilsLogViewerGET', {entities:['Client']}) }}" class="btn btn-tool" role="button">
+                            <i class="fas fa-list"></i> {% trans %}Logs{% endtrans %}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body">
+					<div id="clients-tabulator-table"></div>
+                </div>
+
+                <div class="card-footer text-muted text-center">
+                    <button type="button" class="btn btn-lg btn-tabulator-download btn-csv" title="Download table in CSV">
+                        <i class="fa fa-file-csv"></i>
+                    </button>
+                    <button type="button" class="btn btn-lg btn-tabulator-download btn-xlsx" title="Download table in XLSX">
+                        <i class="fa fa-file-excel"></i>
+                    </button>
+                    <button type="button" class="btn btn-lg btn-tabulator-download btn-json" title="Download table in JSON">
+                        <i class="fa fa-file-code"></i>
+                    </button>
+                </div>
+            </div><!-- /.card -->
+        </div>
+    </div>
+    <!-- /.row -->
+
+    <!-- MODALS -->
+    {{ include('_filterModals.html.twig') }}
+
+    <div class="modal fade" id="modal-group-columns">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-columns"></i> Group Columns</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-setup-columns">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-columns"></i> Setup Columns</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-add">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-plus"></i> New Client</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    
+    <div class="modal fade" id="modal-edit">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">{% trans %}Edit Client{% endtrans %}</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <div class="modal fade" id="modal-detail">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-briefcase"></i> Client</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="modal-detail-body">
+                    <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <a class="nav-link active" id="nav-detail-tab" data-toggle="tab" href="#nav-detail" role="tab" aria-controls="nav-detail" aria-selected="true">Detail</a>
+                        <a class="nav-link" id="nav-audit-tab" data-toggle="tab" href="#nav-audit" role="tab" aria-controls="nav-audit" aria-selected="false">Audit</a>
+                    </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-detail" role="tabpanel" aria-labelledby="nav-detail-tab"></div>
+                        <div class="tab-pane fade" id="nav-audit" role="tabpanel" aria-labelledby="nav-audit-tab"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

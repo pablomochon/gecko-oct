@@ -1,0 +1,29 @@
+{{ include('_jsForms.html.twig') }}
+
+<div class="card">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3">
+				<div class="card card-primary card-outline">
+					<div class="card-body box-profile">
+						<h3 class="profile-username text-center">{{ object.name }}</h3>
+
+						<ul class="list-group list-group-unbordered mb-3 text-break">
+							<li class="list-group-item">
+								<b>Main Role</b> <a class="float-right">{{ object.role.name|default('NO DATA') }}</a>
+							</li>
+							<li class="list-group-item">
+								<b>Secondary Roles</b> <a class="float-right">{% if object.roleSecondary is not empty %}{{ object.roleSecondary|map(p => "#{p.name}")|join(', ') }}{% else %}NO DATA{% endif %}</a>
+							</li>
+						</ul>
+					</div>
+					<!-- /.card-body -->
+				</div>
+				<!-- /.card -->
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container-fluid -->
+	</div>
+	<!-- /.card-body -->
+</div>

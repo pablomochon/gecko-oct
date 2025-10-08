@@ -1,0 +1,41 @@
+api_platform:
+    doctrine:
+        enabled: true
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity']
+    show_webby: false
+    title: 'GECO API'
+    description: 'API for interact with GECO'
+    version: '0.0.7'
+    defaults:
+        pagination_items_per_page: 500
+        pagination_client_enabled: true
+        pagination_client_items_per_page: true
+    openapi:
+        contact:
+            name: Tools
+            email: DL.DL-TS-IB-CSS-Tools@t-systems.com
+    oauth:
+        # To enable or disable oauth.
+        enabled: false
+
+        # The oauth client id.
+        clientId: ''
+
+        # The oauth client secret.
+        clientSecret: ''
+
+        # The oauth type.
+        type: 'oauth2'
+
+        # The oauth flow grant type.
+        flow: 'application'
+
+        # The oauth token url.
+        tokenUrl: '/oauth/v2/token'
+
+        # The oauth authentication url.
+        authorizationUrl: '/oauth/v2/auth'
+
+        # The oauth scopes.
+        scopes: []

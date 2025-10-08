@@ -1,0 +1,148 @@
+{% block javascripts %}
+	<script src="{{ asset('js/luxon.min.js') }}?v={{ filemtime( asset('js/luxon.min.js') ) }}"></script>
+	<script src="{{ asset('js/tabulator.min.js') }}?v={{ filemtime( asset('js/tabulator.min.js') ) }}"></script>
+	<script src="{{ asset('js/xlsx.full.min.js') }}?v={{ filemtime( asset('js/xlsx.full.min.js') ) }}"></script>
+	<script>
+		$(function () {
+			var table = new Tabulator("#apiapps-tabulator-table", {
+                pagination: true,
+                paginationSize:10,
+                paginationSizeSelector:[10, 20, 50, 100, 250, 500, 1000],
+                paginationCounter:"rows",
+                movableColumns: true,
+                persistence:{
+                    sort:true,
+                    filter:true,
+                    columns:true,
+                },
+				data: 
+					[
+						{% for element in table %}
+						{
+							id: '{{ element.id }}',
+							name: '{{ element.name }}',
+							clientId: '{{ element.clientId }}',
+							clientSecret: '{{ element.clientSecret }}',
+							expiresAt: '{{ element.expiresAt|date("Y-m-d H:i:s") }}',
+						},
+						{% endfor %}
+					]
+				,
+				columns:[
+					{title:"Id", field:"id", sorter:"number", visible: false},
+					{title:"Name", field:"name", sorter:"string", headerFilter:"input"},
+					{title:"Client ID", field:"clientId", sorter:"string", headerFilter:"input"},
+					{title:"Client Secret", field:"clientSecret", sorter:"string", headerFilter:"input"},
+					{title:"Expires At", field:"expiresAt", headerFilter:"input", sorter:"datetime", sorterParams:{
+                            format:"yyyy-MM-dd HH:mm:ss",
+                        }, formatter:"datetime", formatterParams:{
+                            inputFormat:"yyyy-MM-dd HH:mm:ss",
+                            outputFormat:"dd/MM/yyyy",
+                            invalidPlaceholder:"(invalid date)",
+                            timezone:"Europe/Madrid",
+                        },
+                    },
+				],
+                rowContextMenu:[
+                    {
+                        label:"Delete Api App",
+                        action:function(e, row){
+                            let id = row.getData().id;
+
+                            $.ajax({
+                                url: "/apiapps/" + id + "/delete",
+                                success: function( data ) {
+                                    row.delete();
+                                }
+                            });
+                        }
+                    },
+                ],
+			});
+
+            table.on("rowClick", function(e, row){
+                let id = row.getData().id;
+
+                $.ajax({
+                    url: "/apiapps/" + id,
+                }).done(function( data ) {
+                    $('#modal-apiapp-body').html('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+                    $('#modal-apiapp').modal('show');
+                });
+            });
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-tools">
+                        {% if is_granted('ROLE_API_EDITOR') %}
+                        <button type="button" class="btn btn-tool"  data-toggle="modal" data-target="#modal-apiapp-add">
+                            <i class="fa fa-plus"></i> {% trans %}New Api App{% endtrans %}
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h6><i class="icon fas fa-check"></i> {{message}}</h6>
+                        </div>
+                    {% endfor %}
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h6><i class="icon fas fa-times"></i> {{ message }}</h6>
+                        </div>
+                    {% endfor %}
+
+					<div id="apiapps-tabulator-table"></div>
+                </div>
+            </div><!-- /.card -->
+        </div>
+    </div>
+    <!-- /.row -->
+
+    <div class="modal fade" id="modal-apiapp-add">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-plus"></i> New Api App</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    {% include 'apiapps/_apiAppForm.html.twig' %}
+                    <!-- /.card-body -->
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <div class="modal fade" id="modal-apiapp">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-user"></i> Api App</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="modal-apiapp-body">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

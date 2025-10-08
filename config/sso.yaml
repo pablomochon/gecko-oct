@@ -1,0 +1,69 @@
+settings:
+    strict: true
+    debug: false
+    baseurl: "{{SSO_ENTITY_ID}}"
+    sp:
+        entityId: "{{SSO_ENTITY_ID}}"
+        assertionConsumerService:
+            url: "{{SSO_ENTITY_ID}}/login"
+            binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+
+        singleLogoutService:
+            url: "{{SSO_ENTITY_ID}}/logout"
+            binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+
+        NameIDFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
+
+        x509cert: "/certs/kcpro.crt"
+
+        privateKey: "/certs/kcpro.key"
+
+    idp:
+        entityId: "{{SSO_URL}}"
+
+        singleSignOnService:
+            url: "{{SSO_URL}}/protocol/saml"
+            binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+
+        singleLogoutService:
+            url: "{{SSO_URL}}/protocol/saml"
+            responseUrl: null
+            binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+
+        x509cert: "/certs/kcpro2.crt"
+
+    ##Advanced Settings
+    compress:
+        requests: true
+        responses: true
+
+    security:
+        nameIdEncrypted: true
+        authnRequestsSigned: true
+        logoutRequestSigned: false
+        logoutResponseSigned: false
+        signMetadata: true
+        wantMessagesSigned: false
+        wantAssertionsEncrypted: false
+        wantAssertionsSigned: false
+        wantNameId: true
+        wantNameIdEncrypted: false
+        requestedAuthnContext: false
+        requestedAuthnContextComparison: "exact"
+        wantXMLValidation: true
+        relaxDestinationValidation: false
+        signatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+        digestAlgorithm: "http://www.w3.org/2001/04/xmlenc#sha256"
+        lowercaseUrlencoding: false
+
+    contactPerson:
+        technical:
+            givenName: "EINES"
+            emailAddress: "fmb-gencat_eines@t-systems.com"
+        support:
+            givenName: "EINES"
+            emailAddress: "fmb-gencat_eines@t-systems.com"
+
+groups_role:
+    ROLE_ADMIN:
+        - "C-CSI_B2"

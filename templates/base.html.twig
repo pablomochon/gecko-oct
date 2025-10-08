@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="shortcut icon" href="{{ asset('build/images/favicon.ico') }}" type="image/x-icon" />
+
+        <title>GECO {% block title %}{% endblock %}</title>
+
+        {{ encore_entry_link_tags('app') }}
+        {% block stylesheets %}
+        {% endblock %}
+
+        {{ encore_entry_script_tags('app') }}
+        {% block javascripts %}
+            {# <script>console.log("Console test");</script> #}
+        {% endblock %}
+
+        {# {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %} #}
+
+        {# {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %} #}
+
+        <script>
+		$(function () {
+            {% for message in app.flashes('info') %}
+                $(document).Toasts('create', {
+                    icon: 'fas fa-info fa-lg',
+                    body: '{{ message|nl2br|replace({"\n": "", "\r": "", "\t": ""})|raw }}'
+                });
+            {% endfor %}
+            {% for message in app.flashes('success') %}
+                $(document).Toasts('create', {
+                    class: 'bg-success',
+                    icon: 'fas fa-check fa-lg',
+                    body: '{{ message|nl2br|replace({"\n": "", "\r": "", "\t": ""})|raw }}'
+                });
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                $(document).Toasts('create', {
+                    class: 'bg-danger',
+                    icon: 'fas fa-exclamation-triangle fa-lg',
+                    body: '{{ message|nl2br|replace({"\n": "", "\r": "", "\t": ""})|raw }}'
+                });
+            {% endfor %}
+		});
+        </script>
+
+    </head>
+    
+    <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed sidebar-mini"> <!-- sidebar-collapse si lo queremos collapsed incialmente -->
+        <div class="wrapper">
+            <!-- Navbar -->
+            {{ include('_navBar.html.twig') }}
+            <div class="content-wrapper">
+                <!-- Main content -->
+                <div class="content">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

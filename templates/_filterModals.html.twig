@@ -1,0 +1,90 @@
+<!-- Save Filter Modal -->
+<div class="modal fade" id="saveFilterModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-save"></i> Save Filter</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="saveFilterForm">
+                    <div class="form-group">
+                        <label for="filterName">Filter Name</label>
+                        <input type="text" class="form-control" id="filterName" required>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="isPublic">
+                        <label class="form-check-label" for="isPublic">Public Filter</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveFilterBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Filter Modal -->
+<div class="modal fade" id="loadFilterModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-filter"></i> Load Filter</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="nav nav-tabs" id="filterTabs" role="tablist">
+                    <a class="nav-link active" id="myFilters-tab" data-toggle="tab" href="#myFilters" role="tab">My Filters</a>
+                    <a class="nav-link" id="publicFilters-tab" data-toggle="tab" href="#publicFilters" role="tab">Public Filters</a>
+                </div>
+                <div class="tab-content mt-3" id="filterTabsContent">
+                    <div class="tab-pane fade show active" id="myFilters" role="tabpanel">
+                        <div class="list-group" id="myFiltersList">
+                            <!-- Lista de filtros del usuario -->
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="publicFilters" role="tabpanel">
+                        <div class="list-group" id="publicFiltersList">
+                            <!-- Lista de filtros públicos -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar filtro -->
+<div class="modal fade" id="editFilterModal" tabindex="-1" role="dialog" aria-labelledby="editFilterModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editFilterModalLabel">Edit Filter</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editFilterId">
+                <div class="form-group">
+                    <label for="editFilterName">Filter Name</label>
+                    <input type="text" class="form-control" id="editFilterName" placeholder="Enter filter name">
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="editIsPublic">
+                    <label class="form-check-label" for="editIsPublic">Public filter (visible to all users)</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="TableFiltersManager.updateFilter()">Update Filter</button>
+            </div>
+        </div>
+    </div>
+</div>

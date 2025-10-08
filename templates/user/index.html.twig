@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+	{# <script src="{{ asset('js/luxon.min.js') }}?v={{ filemtime( asset('js/luxon.min.js') ) }}"></script> #}
+	<script src="{{ asset('js/tabulator.min.js') }}?v={{ filemtime( asset('js/tabulator.min.js') ) }}"></script>
+	{# <script src="{{ asset('js/xlsx.full.min.js') }}?v={{ filemtime( asset('js/xlsx.full.min.js') ) }}"></script> #}
+    {# <script src="{{ asset('js/tabulator-setup-columns.js') }}?v={{ filemtime( asset('js/tabulator-setup-columns.js') ) }}"></script> #}
+	<script>
+		$(function () {
+			var table = new Tabulator("#users-tabulator-table", {
+                pagination: true,
+                paginationSize:10,
+                paginationSizeSelector:[10, 20, 50, 100, 250, 500, 1000],
+                paginationCounter:"rows",
+                persistence:{
+                    sort:true,
+                    filter:true,
+                    columns:true,
+                },
+                movableColumns: true,
+                data:
+                    {{ table|raw }}
+                ,
+                columnDefaults: {
+                    tooltip: true,
+                },
+				columns:[
+					{title:"Id", field:"id", sorter:"number", visible: false},
+					{title:"Username", field:"username", sorter:"string", headerFilter:"input"},
+					{title:"Name", field:"name", sorter:"string", headerFilter:"input"},
+					{title:"Email", field:"email", sorter:"string", headerFilter:"input"},
+					{title:"Roles", field:"roles", sorter:"string", headerFilter:"input"},
+				],
+			});
+
+            table.on("rowClick", function(e, row){
+                let id = row.getData().id;
+
+                $.ajax({
+                    url: "/users/" + id + "/edit",
+                }).done(function( data ) {
+                    $('#nav-detail').html( data );
+                    $('#modal-detail').modal('show');
+                });
+
+                $.ajax({
+                    url: "/users/" + id + "/audit/",
+                }).done(function( data ) {
+                    $('#nav-audit').html(data);
+                });
+
+                $.ajax({
+                    url: "/users/" + id + "/apiapps/",
+                }).done(function(data) {
+                    $('#nav-api').html(data);
+                });
+
+            });
+
+            // Global Search
+		    $("#global-search").on("input", function(){
+                let value = $(this).val().toLowerCase();
+
+                if (value){
+				    table.setFilter(function(data, filterParams){
+					// Check all columns for the filter value
+					return Object.values(data).some(function(field){
+						return String(field).toLowerCase().includes(value);
+					});
+				});
+			    } else {
+				    table.clearFilter();
+			    }
+		    });
+
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa fa-user"></i> {{ pageTitle }}</h3>
+
+                    <div class="card-tools">
+                        <div class="d-flex gap-2">
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <button type="button" class="btn btn-tool" data-toggle="modal" data-target="#modal-add" urlAdd="{{ path('app_usersAdd') }}">
+                                <i class="fa fa-plus"></i> New User
+                            </button>
+                            {% endif %}
+                            <input id="global-search" type="text" placeholder="Search all columns..." class="form-control w-auto">
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="card-body">
+					<div id="users-tabulator-table"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-add">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-user-plus"></i> New User</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="modal-add-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-detail">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa fa-user"></i> User</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="modal-detail-body">
+                    <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <a class="nav-link active" id="nav-detail-tab" data-toggle="tab" href="#nav-detail" role="tab" aria-controls="nav-detail" aria-selected="true">Detail</a>
+                        <a class="nav-link" id="nav-audit-tab" data-toggle="tab" href="#nav-audit" role="tab" aria-controls="nav-audit" aria-selected="false">Audit</a>
+                        <a class="nav-link" id="nav-api-tab" data-toggle="tab" href="#nav-api" role="tab" aria-controls="nav-api" aria-selected="false">API Apps</a>
+                    </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-detail" role="tabpanel" aria-labelledby="nav-detail-tab"></div>
+                        <div class="tab-pane fade" id="nav-audit" role="tabpanel" aria-labelledby="nav-audit-tab"></div>
+                        <div class="tab-pane fade" id="nav-api" role="tabpanel" aria-labelledby="nav-api-tab"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

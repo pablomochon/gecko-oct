@@ -1,0 +1,70 @@
+{{ include('_jsForms.html.twig') }}
+
+<div class="card">
+	<div class="card-body">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+					<a href="{{ path('app_clientsDetail', {id: object.environment.service.client.id}) }}">
+						<i class="fa fa-briefcase"></i>
+						Client:
+						{{ object.environment.service.client.name }}</a>
+				</li>
+				<li class="breadcrumb-item">
+					<a href="{{ path('app_servicesDetail', {id: object.environment.service.id}) }}">
+						<i class="fa fa-briefcase"></i>
+						Service:
+						{{ object.environment.service.name }}</a>
+				</li>
+				<li class="breadcrumb-item">
+					<a href="{{ path('app_environmentsDetail', {id: object.environment.id}) }}">
+						<i class="fa fa-briefcase"></i>
+						Environment:
+						{{ object.environment.name }}</a>
+				</li>
+				<li class="breadcrumb-item active" aria-current="page">
+					<i class="fa fa-network-wired"></i>
+					Network Device:
+					{{ object.name }}</li>
+			</ol>
+		</nav>
+
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item active" aria-current="page">
+					<i class="fa fa-network-wired"></i>
+					Network Device:
+					{{ object.name }}</li>
+			</ol>
+		</nav>
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-3">
+					<div class="card card-primary card-outline">
+						<div class="card-body box-profile">
+							<h3 class="profile-username text-center">{{ object.name }}</h3>
+
+							<ul class="list-group list-group-unbordered mb-3 text-break">
+								<li class="list-group-item">
+									<b>Serial Number</b>
+									<a class="float-right">{{ object.serialNumber|default('NO DATA') }}</a>
+								</li>
+								{% if object.active == false %}
+									<li class="list-group-item text-center">
+										<button type="button" class="btn btn-sm btn-danger" title="Not Active">
+											Not Active
+										</button>
+									</li>
+								{% endif %}
+							</ul>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+				<!-- /.col -->
+			</div>
+		</div>
+	</div>
+</div>

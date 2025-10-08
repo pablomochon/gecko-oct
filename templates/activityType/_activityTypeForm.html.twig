@@ -1,0 +1,217 @@
+{{ include('_jsForms.html.twig') }}
+
+{{ form_start(form) }}
+<div class="card shadow-sm mt-3">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h3 class="card-title m-0">
+            <i class="fas fa-money-check-dollar mr-2"></i>
+            {% if form.code.vars.value != '' and object is defined %}
+                {{ object.code }}: {{ object.description }}
+            {% else %}
+                New Activity Type
+            {% endif %}
+        </h3>
+
+        <div class="ml-auto">
+            {% if is_granted('ROLE_ACTIVITY_TYPE_EDITOR') %}
+                <div class="btn-group">
+                    {% if form.code.vars.value != '' and object is defined %}
+                        <button class="btn btn-primary">
+                            <i class="fa fa-save mr-1"></i>
+                            Save
+                        </button>
+                    {% else %}
+                        <button class="btn btn-success">
+                            <i class="fa fa-plus mr-1"></i>
+                            Create
+                        </button>
+                    {% endif %}
+                </div>
+                {% if object is defined %}
+                    <a href="{{ path('app_activityTypesDelete', {id: object.id}) }}" class="btn btn-danger ml-2">
+                        <i class="fa fa-trash mr-1"></i> Delete
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(form.code, 'Activity Code', {'label_attr': {'class': 'font-weight-bold'}}) }}
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-code"></i></span>
+                        </div>
+                        {{ form_widget(form.code, {
+                            'attr': {
+                                'class': 'form-control',
+                            }
+                        })}}
+                    </div>
+                    {{ form_errors(form.code) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(form.description, 'Description', {'label_attr': {'class': 'font-weight-bold'}}) }}
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                        </div>
+                        {{ form_widget(form.description, {
+                            'attr': {
+                                'class': 'form-control'
+                            }
+                        })}}
+                    </div>
+                    {{ form_errors(form.description) }}
+                    <small class="text-muted">Must be unique and max 6 characters</small>
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(form.price, 'Price', {'label_attr': {'class': 'font-weight-bold'}}) }}
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-euro-sign"></i></span>
+                        </div>
+                        {{ form_widget(form.price, {
+                            'attr': {
+                                'class': 'form-control',
+                                'aria-describedby': 'priceHelp'
+                            }
+                        })}}
+                    </div>
+                    <small id="priceHelp" class="form-text text-muted">Enter the price without currency symbol</small>
+                    {{ form_errors(form.price) }}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(form.SAPname, 'SAP Name', {'label_attr': {'class': 'font-weight-bold'}}) }}
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                        </div>
+                        {{ form_widget(form.SAPname, {
+                            'attr': {
+                                'class': 'form-control'
+                            }
+                        })}}
+                    </div>
+                    {{ form_errors(form.SAPname) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(form.type, 'Activity Type', {'label_attr': {'class': 'font-weight-bold'}}) }}
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-tasks"></i></span>
+                        </div>
+                        {{ form_widget(form.type, {
+                            'attr': {
+                                'class': 'form-control single-select2',
+                            }
+                        })}}
+                    </div>
+                    {{ form_errors(form.type) }}
+                    <small class="text-muted">Valid types: a, b, c, other</small>
+                </div>
+                
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <strong>Activity types</strong> are used to categorize and price different operations or services within the system.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-light">
+        <h3 class="card-title">
+            <i class="fas fa-link mr-2"></i>
+            Relationships
+        </h3>
+        <div class="card-tools">
+            <span class="badge badge-warning">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                This activity type can only be related to one type of entity
+            </span>
+        </div>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs" id="relationshipTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="network-devices-tab" data-toggle="tab" href="#network-devices" role="tab">
+                    <i class="fas fa-server mr-1"></i> Network Devices
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="virtual-systems-tab" data-toggle="tab" href="#virtual-systems" role="tab">
+                    <i class="fas fa-network-wired mr-1"></i> Virtual Systems
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="interfaces-tab" data-toggle="tab" href="#interfaces" role="tab">
+                    <i class="fas fa-ethernet mr-1"></i> Network Interfaces
+                </a>
+            </li>
+        </ul>
+        
+        <div class="tab-content pt-3" id="relationshipTabsContent">
+            <div class="tab-pane fade show active" id="network-devices" role="tabpanel">
+                <div class="form-group">
+                    {{ form_widget(form.networkDevices, {
+                        'attr': {
+                            'placeholder': 'Select Network Devices',
+							'class': 'form-control single-select2-ajax',
+							'ajaxEndpoint': path('app_select2networkDeviceData'),
+							'required': form.networkDevices.vars.required,
+                        }
+                    }) }}
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Selecting devices here will disable other relationship options
+                    </small>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="virtual-systems" role="tabpanel">
+                <div class="form-group">
+                    {{ form_widget(form.networkVirtualSystems, {
+                        'attr': {
+                            'placeholder': 'Select Virtual Systems',
+							'class': 'form-control single-select2-ajax',
+							'ajaxEndpoint': path('app_select2networkVirtualSystemsData'),
+							'required': form.networkVirtualSystems.vars.required,
+                        }
+                    }) }}
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Selecting virtual systems here will disable other relationship options
+                    </small>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="interfaces" role="tabpanel">
+                <div class="form-group">
+                    {{ form_widget(form.networkInterfaces, {
+                        'attr': {
+                            'placeholder': 'Select Network Interfaces',
+							'class': 'form-control single-select2-ajax',
+							'ajaxEndpoint': path('app_select2networkInterfacesData'),
+							'required': form.networkInterfaces.vars.required,
+                        }
+                    }) }}
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Selecting interfaces here will disable other relationship options
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}

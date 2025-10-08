@@ -1,0 +1,68 @@
+{{ include('_jsForms.html.twig') }}
+
+{{ form_start(form) }}
+<div class="card">
+	<div class="card-header">
+		<h3 class="card-title">SAML Profile</h3>
+
+		<div class="card-tools">
+			{% if is_granted('ROLE_ADMIN') %}
+					<div class="btn-group">
+						{% if form.name.vars.value != '' and object is defined %}
+							<button class="btn bg-green">
+								<i class="fa fa-save"></i>
+								Save</button>
+						{% elseif form.name.vars.value == '' %}
+							<button class="btn bg-green">
+								<i class="fa fa-save"></i>
+								Create New</button>
+						{% endif %}
+					</div>
+			{% endif %}
+			{% if object is defined %}
+				{% if is_granted('ROLE_ADMIN') %}<a href="{{ path('app_samlProfilesDelete', {id: object.id}) }}" class="btn btn-dark"><i class="fa fa-trash"></i> Delete</a>{% endif %}
+			{% endif %}
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="form-row">
+            <div class="form-group col-md-6">
+                    {{ form_label(form.name) }}
+                    {{ form_errors(form.name) }}
+                    {{ form_widget(form.name, {
+                        'attr': {
+                            'placeholder': 'Name',
+                            'class': 'form-control',
+                        }
+                    })
+                    }}
+                    {{ form_help(form.name) }}
+            </div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-6">
+                {% if form.vars.data is null %}
+                    {% set id = 'new' %}
+                {% else %}
+                    {% set id = form.vars.data.id %}
+                {% endif %}
+
+                {{ form_label(form.roles) }}
+                {{ form_errors(form.roles) }}
+                {{ form_widget(form.roles, {
+                        'attr': {
+                            'placeholder': 'Roles',
+                            'class': 'form-control single-select2',
+                            'multiple': 'multiple',
+                            'required': form.roles.vars.required,
+                        },
+                        'id': 'user_roles_' ~ id
+                    })
+                    }}
+                {{ form_help(form.roles) }}
+            </div>
+		</div>
+	</div>
+	<!-- /.card-body -->
+</div>
+{{ form_end(form) }}

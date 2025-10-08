@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="shortcut icon" href="{{ asset('build/images/favicon.ico') }}" type="image/x-icon" />
+
+        <title>GECO {{ pageTitle }}</title>
+        
+        {{ encore_entry_link_tags('app') }}
+        {{ encore_entry_script_tags('app') }}
+    </head>
+    
+    <body class="hold-transition login-page">
+        <div class="login-box">
+            <div class="login-logo">
+                <a href="#" class="brand-link">
+                    <img src="{{ asset( 'build/images/tsystems-magenta.png' )}}" alt="GECO logo" style="vertical-align: middle;line-height:.8; max-height:33px;margin-right: .5rem;margin-top: -3px">
+                    GECO
+                </a>
+            </div>
+            <!-- /.login-logo -->
+            <div class="card">
+                <div class="card-body login-card-body">
+                    {% if error %}
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h6><i class="icon fas fa-check"></i> {{ error.messageKey|trans(error.messageData, 'security') }}</h6>
+                        </div>
+                    {% endif %}
+
+                    <p class="login-box-msg">Sign in to start your session</p>
+
+                    <form action="{{ path('app_login') }}" method="post">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="User" value="{{ last_username }}" id="username" name="_username">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-user"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input type="password" class="form-control" placeholder="Password" id="password" name="_password" />
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        </div>
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="icheck-maroon">
+                                    <input type="checkbox" id="remember_me" name="_remember_me">
+                                    <label for="remember_me">
+                                        Remember Me
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-4">
+                                <button type="submit" class="btn btn-block bg-gradient-maroon">Sign In</button>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                    </form>
+
+                    <div class="text-center mb-3">
+                        <p>- OR -</p>
+                        <a href="{{ path('app_login_sso') }}" class="btn btn-block bg-gradient-maroon">
+                            <i class="fa fa-sign-in-alt mr-2"></i> Sign in using SSO (CIAM)
+                        </a>
+                    </div>
+                    <!-- /.social-auth-links -->
+
+                </div>
+                <!-- /.login-card-body -->
+            </div>
+        </div>
+        <!-- /.login-box -->
+    </body>
+</html>

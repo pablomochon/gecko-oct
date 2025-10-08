@@ -1,0 +1,52 @@
+{{ include('_jsForms.html.twig') }}
+
+<div class="card">
+	<div class="card-body">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-3">
+					<div class="card card-primary card-outline">
+						<div class="card-body box-profile">
+							<h3 class="profile-username text-center">{{ object.name }}</h3>
+							
+							<ul class="list-group list-group-unbordered mb-3">
+								<li class="list-group-item">
+									<b>Code</b> <a class="float-right">{{ object.code|default('NO DATA') }}</a>
+								</li>
+							</ul>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+				<!-- /.col -->
+				<div class="col-md-9">
+					{% if object.services | length != 0 %}
+					<div class="card card-primary">
+						<div class="card-header">
+							<h3 class="card-title"><i class="fas fa-briefcase mr-1"></i> Services</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							{% for service in object.services %}
+								{% if service.active == true %}
+									<p>
+										<strong><a href="{{ path('app_servicesDetail', {id: service.id}) }}">{{ service.name }}</a></strong> 
+									</p>
+									{% if loop.last == false %}<hr>{% endif %}
+								{% endif %}
+							{% endfor %}
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+					{% endif %}
+				</div>
+				<!-- /.col -->
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container-fluid -->
+	</div>
+	<!-- /.card-body -->
+</div>

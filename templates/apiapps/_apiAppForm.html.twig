@@ -1,0 +1,34 @@
+{{ form_start(formApiApp) }}
+<div class="form-row">
+	<div class="form-group col-md-6">
+		{{ form_label(formApiApp.name) }}
+		{{ form_errors(formApiApp.name) }}
+		{{ form_widget(formApiApp.name, {
+                'attr': {
+                    'placeholder': 'Name',
+                    'class': 'form-control',
+                }
+            })
+            }}
+		{{ form_help(formApiApp.name) }}
+	</div>
+</div>
+{% if is_granted('ROLE_API_EDITOR') %}
+<hr>
+<div class="row">
+	<div class="col col-md-12">
+		<div class="btn-group">
+			{% if formApiApp.name.vars.value != '' %}
+				<button class="btn bg-green">
+					<i class="fa fa-save"></i>
+					Save</button>
+			{% else %}
+				<button class="btn bg-green">
+					<i class="fa fa-save"></i>
+					Create New</button>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% endif %}
+{{ form_end(formApiApp) }}

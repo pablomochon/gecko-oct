@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ pageTitle }}{% endblock %}
+
+{% block javascripts %}
+	<script src="{{ asset('js/tabulator.min.js') }}?v={{ filemtime( asset('js/tabulator.min.js') ) }}"></script>
+	<script>
+		$(function () {
+            $.ajax({
+                url: "/users/" + {{ app.request.get('id') }} + "/edit",
+            }).done(function( data ) {
+                $('#nav-detail').html( data );
+                $('.single-select2').each(function (i, obj) {
+                    if (typeof $(obj).attr('required') === 'undefined') {
+                        var required = true;
+                    } else {
+                        var required = false;
+                    }
+                    if (!$(obj).hasClass("select2-hidden-accessible")) {
+                        $(obj).select2({
+                            width: '100%',
+                            theme: 'bootstrap4',
+                            allowClear: required,
+                            placeholder: $(obj).attr('placeholder'),
+                        });
+                    }
+                });
+            });
+            
+            $.ajax({
+                url: "/users/" + {{ app.request.get('id') }} + "/audit/",
+            }).done(function( data ) {
+                $('#nav-audit').html( data );
+            });
+
+            $.ajax({
+                url: "/users/" + {{ app.request.get('id') }} + "/apiapps/",
+            }).done(function( data ) {
+                $('#nav-api').html( data );
+            });
+            
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa fa-user"></i> {{ pageTitle }}</h3>
+                </div>
+
+                <div class="card-body">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <a class="nav-link active" id="nav-detail-tab" data-toggle="tab" href="#nav-detail" role="tab" aria-controls="nav-detail" aria-selected="true">Detail</a>
+                            <a class="nav-link" id="nav-audit-tab" data-toggle="tab" href="#nav-audit" role="tab" aria-controls="nav-audit" aria-selected="false">Audit</a>
+                            <a class="nav-link" id="nav-api-tab" data-toggle="tab" href="#nav-api" role="tab" aria-controls="nav-api" aria-selected="false">API Apps</a>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-detail" role="tabpanel" aria-labelledby="nav-detail-tab"></div>
+                        <div class="tab-pane fade" id="nav-audit" role="tabpanel" aria-labelledby="nav-audit-tab"></div>
+                        <div class="tab-pane fade" id="nav-api" role="tabpanel" aria-labelledby="nav-api-tab"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
